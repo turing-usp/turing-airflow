@@ -54,9 +54,9 @@ def check_valid(df: pd.DataFrame) -> bool:
 
 
 def extraction():
-    TOKEN = 'BQAIKv4NS3Ra8M2X0TOWk-0dPeHDv97Ac0aNar92dcMnWGlOxs8M6MAfhuoE5fhnO'
-    'xdht9S_SMEY0FyUCoc0HjH3NbRYGM6EKZ4_GEZWwfsyIiZowIo6UdXM4FCsQ75oCHjcRfLp6c'
-    'MVucSSsKztdxgQ'
+    TOKEN = 'BQAHFSflxiv4JEQB2xt2yIdVW3_5o3Kg4pASKzxO6-4XigKpIcJsFo5O3NEMth78h'
+    'actJuAArcERuGum7gl4Jdgnm4J6Ovm87Pm7ZopqAZ0yKTqo27crPma7o_v4ntR4WXx2R6BNpu'
+    '2vp75uPtqlHfop'
 
     headers = {
         'Accept': 'application/json',
