@@ -2,11 +2,11 @@ import datetime
 from datetime import timedelta
 
 import pandas as pd
-import psycopg2
 import requests
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
+import awswrangler as wr
 
 default_args = {
     'owner': 'murilokrebsky',
@@ -37,7 +37,7 @@ def check_valid(df: pd.DataFrame) -> bool:
         pass
     else:
         raise Exception('Primary key check not valid')
- 
+
     if df.insull().values.any():
         raise Exception('Null value found')
 
@@ -49,7 +49,7 @@ def check_valid(df: pd.DataFrame) -> bool:
     for timestamp in timestamps:
         if datetime.datetime.strptime(timestamp, "%Y-%m-%d") != yesterday:
             raise Exception('Datetime invalid')
-    
+
     return True
 
 
@@ -57,7 +57,6 @@ def extraction():
     TOKEN = 'BQAIKv4NS3Ra8M2X0TOWk-0dPeHDv97Ac0aNar92dcMnWGlOxs8M6MAfhuoE5fhnO'
     'xdht9S_SMEY0FyUCoc0HjH3NbRYGM6EKZ4_GEZWwfsyIiZowIo6UdXM4FCsQ75oCHjcRfLp6c'
     'MVucSSsKztdxgQ'
-    print(TOKEN)
 
     headers = {
         'Accept': 'application/json',
@@ -101,31 +100,13 @@ def extraction():
         ]
     )
 
-    insert_query = """
-        INSERT INTO public.spotify_data (song_name, artist_name,
-                                        played_at, date_played)
-        VALUES (%s, %s, %s, %s)
-    """
-
-    try:
-        conn = psycopg2.connect(
-            host='localhost',
-            database='spotify',
-            user='postgres',
-            password='*********'
-        )
-        cursor = conn.cursor()
-
-        for index, row in df.iterrows():
-            cursor.execute(insert_query, (
-                row['song_name'], row['artist_name'],
-                row['played_at'], row['timestamp'])
-            )
-    except Exception:
-        conn.rollback()
-        conn.close()
-
-    conn.commit()
+    wr.s3.to_parquet(
+        df=df,
+        path='s3://turing-datalake/processados/spotify/',
+        dataset=True,
+        database='processados',
+        table='spotify'
+    )
 
 
 extract = PythonOperator(

@@ -1,0 +1,3 @@
+awswrangler
+requests
+pandas
